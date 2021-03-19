@@ -69,23 +69,23 @@ def update_graph_live(n):
               Input('interval-component', 'n_intervals'))
 def update_graph_live(n):
 
-    df = getCurrentDataframe()
-    df2 = pd.DataFrame({'Date' : [], 'Power' : []})
-    df2.astype({'Date': 'string'}).dtypes
+    #df = getCurrentDataframe()
+    #df2 = pd.DataFrame({'Date' : [], 'Power' : []})
+    #df2.astype({'Date': 'string'}).dtypes
 
-    #df2["Date"][0] = df["#Time"][0][:-3] 
-    #if df2["Date"][len(df2.index)] != df["#Time"][len(df2.index)-1]:
-    if not df2['Date'].str.contains(str(date.today())).any():
-        #df2["Date"][int(date.today())] = df["E-Day"][0]
-        df2 = df2.append({'Date': df["#Time"][len(df2.index)][:-8], 'Power': df["E-Day"][0]}, ignore_index=True)            #neeeeds lot of work  !!!!!!!!!!! :(
-        print("doesnt contain")
-    print(df2.head())
+    ##df2["Date"][0] = df["#Time"][0][:-3] 
+    ##if df2["Date"][len(df2.index)] != df["#Time"][len(df2.index)-1]:
+    #if not df2['Date'].str.contains(str(date.today())).any():
+    #    #df2["Date"][int(date.today())] = df["E-Day"][0]
+    #    df2 = df2.append({'Date': df["#Time"][len(df2.index)][:-8], 'Power': df["E-Day"][0]}, ignore_index=True)            #neeeeds lot of work  !!!!!!!!!!! :(
+    #    print("doesnt contain")
+    #print(df2.head())
 
-    #df2["Date"][df2.size] = df["E-Day"][0]
+    ##df2["Date"][df2.size] = df["E-Day"][0]
 
-    #fig = px.bar(df2)
+    ##fig = px.bar(df2)
 
-    fig = px.bar()
+    #fig = px.bar()
    
     return()
 
