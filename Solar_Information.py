@@ -65,29 +65,34 @@ def update_graph_live(n):
 
     return fig
 
-@app.callback(Output('weekPowerGraph', 'figure'),
+@app.callback(Output('weekPowerGraph', 'figure'),                   # week Powergraph
               Input('interval-component', 'n_intervals'))
 def update_graph_live(n):
 
-    #df = getCurrentDataframe()
-    #df2 = pd.DataFrame({'Date' : [], 'Power' : []})
-    #df2.astype({'Date': 'string'}).dtypes
+    df = getCurrentDataframe()
 
-    ##df2["Date"][0] = df["#Time"][0][:-3] 
-    ##if df2["Date"][len(df2.index)] != df["#Time"][len(df2.index)-1]:
-    #if not df2['Date'].str.contains(str(date.today())).any():
-    #    #df2["Date"][int(date.today())] = df["E-Day"][0]
-    #    df2 = df2.append({'Date': df["#Time"][len(df2.index)][:-8], 'Power': df["E-Day"][0]}, ignore_index=True)            #neeeeds lot of work  !!!!!!!!!!! :(
-    #    print("doesnt contain")
-    #print(df2.head())
+    eDay = df.at[0, 'E-Day']
+    time =  df.at[0, "#Time"]
+    time = time[:-9]
 
-    ##df2["Date"][df2.size] = df["E-Day"][0]
+    try:
+        df2 = pd.read_csv("internal\daily-e.csv", index_col=False)
+    except IOError:
+        df2 = pd.DataFrame({'Time' : [], 'E-Day' : []})
 
-    ##fig = px.bar(df2)
 
-    #fig = px.bar()
+
+    if time in df2.values:                                  #will overwrite after on year              and doesnt work :(
+        index = df2[df2["Time"]==time].index.values
+        df2.at[index, "E-Day"] = eDay          #I dunno stupid              needs to replace previous value                maybe set time as index
+        df2.to_csv(r"internal\daily-e.csv")
+    else:
+        df2 = df2.append({'E-Day': eDay, 'Time' : time}, ignore_index=True)
+        df2.to_csv(r"internal\daily-e.csv")
+    
+    fig = px.bar(df2, x="Time", y="E-Day")
    
-    return()
+    return fig
 
 
 @app.callback(Output('E-Day', 'children'),
