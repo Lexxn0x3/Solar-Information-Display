@@ -3,7 +3,7 @@
 #Compyright:        Robin Rosner
 #E-Mail:            robinrosner@outlook.de
 
-#Code is released under a MIT license
+#Solar-Information-Display © 2021 by Robin Rosner is licensed under CC BY-NC-SA 4.0
 
 import pandas as pd                         #Import panda library for dataframe operations
 import os                                   #Import OS for os spcific operations e.g. IO
