@@ -3,7 +3,7 @@
 #Compyright:        Robin Rosner
 #E-Mail:            robinrosner@outlook.de
 
-#Solar-Information-Display © 2021 by Robin Rosner is licensed under CC BY-NC-SA 4.0
+#Solar-Information-Display � 2021 by Robin Rosner is licensed under CC BY-NC-SA 4.0
 
 import pandas as pd                         #Import panda library for dataframe operations
 import os                                   #Import OS for os spcific operations e.g. IO
@@ -16,7 +16,7 @@ import plotly.express as px
 import datetime                             #Import datetime for time operations
 from datetime import date
 import socket
-from pathlib import Path
+#from pathlib import Path
 
 from dash.dependencies import Input, Output
 
@@ -24,7 +24,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))                          
 
 def getCurrentDataframe():                                                          #definition of funcition wich automaticly creates and returnes an uptodate dataframe from current days data
     #If windows
-    list_of_files = glob.glob(dir_path + "/*.csv")                                  #creates a list of all .csv files in directory
+    list_of_files = glob.glob(dir_path + "/*.csv")
     #If linux
     #list_of_files = glob.glob(dir_path + "/*.csv")
     latest_file = max(list_of_files, key=os.path.getctime)                          #gets the fille with tha maximum time stamp = most current file
