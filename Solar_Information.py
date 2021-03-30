@@ -73,15 +73,10 @@ def update_graph_live(n):                                                       
 
     return fig                                                                      #returnes the fig
 
-<<<<<<< Updated upstream
-@app.callback(Output('weekPowerGraph', 'figure'),
-=======
 @app.callback(Output('weekPowerGraph', 'figure'),                                   #defining a callback for the wekly powergraph wich is called everytime the graphs refreshes = intervall component as trigger
->>>>>>> Stashed changes
               Input('interval-component', 'n_intervals'))
 def update_graph_live(n):                                                           #called funktion from callback
 
-<<<<<<< Updated upstream
     #df = getCurrentDataframe()
     #df2 = pd.DataFrame({'Date' : [], 'Power' : []})
     #df2.astype({'Date': 'string'}).dtypes
@@ -93,7 +88,6 @@ def update_graph_live(n):                                                       
     #    df2 = df2.append({'Date': df["#Time"][len(df2.index)][:-8], 'Power': df["E-Day"][0]}, ignore_index=True)            #neeeeds lot of work  !!!!!!!!!!! :(
     #    print("doesnt contain")
     #print(df2.head())
-=======
     df = getCurrentDataframe()                                                      #calls previous funktion to get newest dataframe
 
     eDay = df.at[0, 'E-Day']                                                        #gets the untill now produced energy from row: 0, Column: E-Day 
@@ -104,7 +98,6 @@ def update_graph_live(n):                                                       
         df2 = pd.read_csv("internal\daily-e.csv", index_col=False)                  #trys to read daily-e.csv and converting it to df
     except IOError:                                                                 #if an IOError is thrown code will continue and
         df2 = pd.DataFrame({'Time' : [], 'E-Day' : []})                             #and create a new empty df with Tiem and E-Day colums
->>>>>>> Stashed changes
 
     ##df2["Date"][df2.size] = df["E-Day"][0]
 
@@ -116,6 +109,7 @@ def update_graph_live(n):                                                       
 
 
 @app.callback(Output('E-Day', 'children'),                                          #defining a callback for the produces energy for day
+              Input('interval-component', 'n_intervals'))
 def update_text_live(n):                                                            #called funktion from callback
     
     df = getCurrentDataframe()                                                      #calls previous funktion to get newest dataframe
