@@ -3,7 +3,7 @@
 #Compyright:        Robin Rosner
 #E-Mail:            robinrosner@outlook.de
 
-#Solar-Information-Display � 2021 by Robin Rosner is licensed under CC BY-NC-SA 4.0
+#Solar-Information-Display  2021 by Robin Rosner is licensed under CC BY-NC-SA 4.0
 
 import pandas as pd                         #Import panda library for dataframe operations
 import os                                   #Import OS for os spcific operations e.g. IO
@@ -16,7 +16,14 @@ import plotly.express as px
 import datetime                             #Import datetime for time operations
 from datetime import date
 import socket
-#from pathlib import Path
+from pathlib import Path
+
+if os.name == 'nt':
+    linux = False
+else:
+    linux = True
+
+weekGraphLastShownAmount = 14
 
 from dash.dependencies import Input, Output
 
@@ -94,10 +101,20 @@ def update_graph_live(n):                                                       
     time =  df.at[0, "#Time"]                                                       #gets the current daytime from row: 0, Column: E-Day 
     time = time[:-9]                                                                #cuts off time and year -> dd/mm
 
-    try:                                                                            #trys the following due to the possiblity that file my not exsist
-        df2 = pd.read_csv("internal\daily-e.csv", index_col=False)                  #trys to read daily-e.csv and converting it to df
-    except IOError:                                                                 #if an IOError is thrown code will continue and
-        df2 = pd.DataFrame({'Time' : [], 'E-Day' : []})                             #and create a new empty df with Tiem and E-Day colums
+    if linux:
+        outdir = dir_path + "/internal/"
+        if not os.path.exists(dir_path + "/internal/"):
+            os.mkdir(dir_path + "/internal")
+
+    if Path(dir_path + "/internal/daily-e.csv").is_file():
+        df2 = pd.read_csv("internal/daily-e.csv", index_col=False)
+    else:
+        df2 = pd.DataFrame({'Time' : [], 'E-Day' : []})
+
+    #try:                                                                            #trys the following due to the possiblity that file my not exsist
+    #    df2 = pd.read_csv("internal\daily-e.csv", index_col=False)                  #trys to read daily-e.csv and converting it to df
+    #except IOError:                                                                 #if an IOError is thrown code will continue and
+    #    df2 = pd.DataFrame({'Time' : [], 'E-Day' : []})                             #and create a new empty df with Tiem and E-Day colums
 
     ##df2["Date"][df2.size] = df["E-Day"][0]
 
@@ -105,7 +122,19 @@ def update_graph_live(n):                                                       
 
     #fig = px.bar()
    
-    return()
+    if time in df2.values:                                  #will overwrite after on year              and doesnt work :(
+        index = df2[df2["Time"]==time].index.values
+        df2.at[index, "E-Day"] = eDay          #I dunno stupid              needs to replace previous value                maybe set time as index
+        df2.to_csv(dir_path + "/internal/daily-e.csv")
+    else:
+        df2 = df2.append({'E-Day': eDay, 'Time' : time}, ignore_index=True)
+        df2.to_csv(dir_path + "/internal/daily-e.csv")
+    
+    df2 = df2.tail(weekGraphLastShownAmount)
+
+    fig = px.bar(df2, x="Time", y="E-Day")
+   
+    return fig
 
 
 @app.callback(Output('E-Day', 'children'),                                          #defining a callback for the produces energy for day
@@ -128,11 +157,13 @@ def update_text_live(n):                                                        
 
 
 if __name__ == '__main__':                                                          #check if name = name
-    app.run_server(                                                                 #calls funktion to start werbserver
-        port="8050",                                                                #defines the web port to 8050.  Standart http port  = 8080
-        host=str(socket.gethostbyname(socket.gethostname()))                        #sets the ipaddr for win machines by getting curr ipaddr of machiiine
-        #host="10.18.40.200"                                                        #manually sets ip addr for linux production enviroment
-        )
-
-#if __name__ == '__main__':
-#    app.run_server(debug=True)
+    if linux:
+        app.run_server(                                                                 #calls funktion to start werbserver
+            port="8050",                                                                #defines the web port to 8050.  Standart http port  = 8080
+            host="10.18.40.200"                                                         #manually sets ip addr for linux production enviroment
+            )
+    else:
+        app.run_server(                                                                 #calls funktion to start werbserver
+            port="8050",                                                                #defines the web port to 8050.  Standart http port  = 8080
+            host=str(socket.gethostbyname(socket.gethostname()))                        #sets the ipaddr for win machines by getting curr ipaddr of machiiine
+            )
