@@ -8,13 +8,12 @@
 import pandas as pd                         #Import panda library for dataframe operations
 import os                                   #Import OS for os spcific operations e.g. IO
 import glob                                 #Import glob for directory and file opterations 
-#import matplotlib.pyplot as plt             #Import matplotlib for graphical visulizations
 import dash                                 #Import Dash. Main component for providing web services and generation Html file and server
 import dash_core_components as dcc          #Dash core essentials
 import dash_html_components as html         #Dash HTML elements
+from dash.dependencies import Input, Output
 import plotly.express as px                 
 import datetime                             #Import datetime for time operations
-from datetime import date
 import socket
 from pathlib import Path
 
@@ -24,8 +23,6 @@ else:
     linux = True
 
 weekGraphLastShownAmount = 14
-
-from dash.dependencies import Input, Output
 
 dir_path = os.path.dirname(os.path.realpath(__file__))                              #specify main datapath for .csv files. Currently automaticly at path of the executable
 
@@ -100,17 +97,6 @@ def update_graph_live(n):                                                       
         df2 = pd.read_csv(dir_path + "/internal/daily-e.csv", index_col=False)
     else:
         df2 = pd.DataFrame({'Time' : [], 'E-Day' : []},)
-
-    #try:                                                                            #trys the following due to the possiblity that file my not exsist
-    #    df2 = pd.read_csv("internal\daily-e.csv", index_col=False)                  #trys to read daily-e.csv and converting it to df
-    #except IOError:                                                                 #if an IOError is thrown code will continue and
-    #    df2 = pd.DataFrame({'Time' : [], 'E-Day' : []})                             #and create a new empty df with Tiem and E-Day colums
-
-    ##df2["Date"][df2.size] = df["E-Day"][0]
-
-    ##fig = px.bar(df2)
-
-    #fig = px.bar()
    
     if time in df2.values:                                  #will overwrite after on year              and doesnt work :(
         index = df2[df2["Time"]==time].index.values
