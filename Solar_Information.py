@@ -8,7 +8,7 @@
 import pandas as pd                         #Import panda library for dataframe operations
 import os                                   #Import OS for os spcific operations e.g. IO
 import glob                                 #Import glob for directory and file opterations 
-import matplotlib.pyplot as plt             #Import matplotlib for graphical visulizations
+#import matplotlib.pyplot as plt             #Import matplotlib for graphical visulizations
 import dash                                 #Import Dash. Main component for providing web services and generation Html file and server
 import dash_core_components as dcc          #Dash core essentials
 import dash_html_components as html         #Dash HTML elements
@@ -47,9 +47,9 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)            
                                                                                     #Definition of the Html lyout
 app.layout = html.Div(                                                              #defining a Html Div container wich includes:
     html.Div([                                                                      #another div
-        html.H2("PV-Anlage Produktion"),                                            #a Headline (H2)
-        html.H4(id='E-Day'),                                                        #a smaller headline (H4)
-        html.H4(id='E-Total'),                                                      #a smaller headline (H4)
+       # html.H2("PV-Anlage Produktion"),                                            #a Headline (H2)
+        html.H5(id='E-Day'),                                                        #a smaller headline (H4)
+        html.H5(id='E-Total'),                                                      #a smaller headline (H4)
         dcc.Graph(id='todayPowerGraph'),                                            #a graph for power over day
         dcc.Graph(id='weekPowerGraph'),                                             #a graph for power over last days
         dcc.Interval(                                                               #a intervall component wich automaicly refreshes content of the page after 1000 miliseconds
@@ -78,23 +78,13 @@ def update_graph_live(n):                                                       
 
     fig = px.line(df2, x="Time", y="Power", line_shape="spline")                    #creates a new fig in the form of lines wich are connected trough splines (smoother graph)
 
+
     return fig                                                                      #returnes the fig
 
 @app.callback(Output('weekPowerGraph', 'figure'),                                   #defining a callback for the wekly powergraph wich is called everytime the graphs refreshes = intervall component as trigger
               Input('interval-component', 'n_intervals'))
 def update_graph_live(n):                                                           #called funktion from callback
 
-    #df = getCurrentDataframe()
-    #df2 = pd.DataFrame({'Date' : [], 'Power' : []})
-    #df2.astype({'Date': 'string'}).dtypes
-
-    ##df2["Date"][0] = df["#Time"][0][:-3] 
-    ##if df2["Date"][len(df2.index)] != df["#Time"][len(df2.index)-1]:
-    #if not df2['Date'].str.contains(str(date.today())).any():
-    #    #df2["Date"][int(date.today())] = df["E-Day"][0]
-    #    df2 = df2.append({'Date': df["#Time"][len(df2.index)][:-8], 'Power': df["E-Day"][0]}, ignore_index=True)            #neeeeds lot of work  !!!!!!!!!!! :(
-    #    print("doesnt contain")
-    #print(df2.head())
     df = getCurrentDataframe()                                                      #calls previous funktion to get newest dataframe
 
     eDay = df.at[0, 'E-Day']                                                        #gets the untill now produced energy from row: 0, Column: E-Day 
@@ -107,9 +97,9 @@ def update_graph_live(n):                                                       
             os.mkdir(dir_path + "/internal")
 
     if Path(dir_path + "/internal/daily-e.csv").is_file():
-        df2 = pd.read_csv("internal/daily-e.csv", index_col=False)
+        df2 = pd.read_csv(dir_path + "/internal/daily-e.csv", index_col=False)
     else:
-        df2 = pd.DataFrame({'Time' : [], 'E-Day' : []})
+        df2 = pd.DataFrame({'Time' : [], 'E-Day' : []},)
 
     #try:                                                                            #trys the following due to the possiblity that file my not exsist
     #    df2 = pd.read_csv("internal\daily-e.csv", index_col=False)                  #trys to read daily-e.csv and converting it to df
