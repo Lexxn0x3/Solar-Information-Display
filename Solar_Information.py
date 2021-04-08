@@ -7,24 +7,24 @@
 
 import pandas as pd                         #Import pandas for data analysis
 import os                                   #Import OS for operating system interfaces
-import glob                                 #Import glob for unix style pathname pattern matching
-import dash                                 #Import Dash as framework for building web applications
-import dash_core_components as dcc          #Import core components for core set of interactive dash components
-import dash_html_components as html         #Import html components for python abstraction around HTML, CSS, and JavaScript
+import glob                                 #Import glob for Unix style pathname pattern matching
+import dash                                 #Import Dash as a framework for building web applications
+import dash_core_components as dcc          #Import core components for the core set of interactive dash components
+import dash_html_components as html         #Import Html components for python abstraction around HTML, CSS, and JavaScript
 from dash.dependencies import Input, Output #Import Input and Output from Dash dependencies for callbacks
 import plotly.express as px                 #Import plotly for creating figures
 import datetime                             #Import datetime for time operations
 import socket                               #Import socket for low-level networking interface operations
 from pathlib import Path                    #Import pathlib for filesystem operations
 
-if os.name == "nt":                         #if statement to check if operting system is nt (nt for Windows based operating systems)
-                                            #os.name returnes the name and it has to equal "nt" to set the variable linux to False otherwise the os has to be Linux
-    linux = False                           #in wich case the variable is set to True
+if os.name == "nt":                         #if statement to check if operating system is nt (nt for Windows-based operating systems)
+                                            #os.name returns the name and it has to equal "nt" to set the variable linux to False otherwise the os has to be Linux
+    linux = False                           #in which case the variable is set to True
 else:
     linux = True
 
 weekGraphLastShownAmount = 14               #creates a variable for how many of the last days should be visible in the week bar graph
-                                            #here the value 14 is asigned
+                                            #here the value 14 is assigned
 
 dir_path = os.path.dirname(os.path.realpath(__file__))                              #specify main datapath for .csv files. Currently automaticly at path of the executable
                                                                                     #creates variable dir_path and assignes the returned value from function os.path.dirname which is provided with with
@@ -39,36 +39,37 @@ def getCurrentDataframe():                                                      
                                                                                     #max uses here two arguments: the list of files where the latest file should be selected
                                                                                     #and a key which defines the search parameter in this the metadata change time of the files
 
-    df = pd.read_csv(latest_file, skiprows=2, delimiter=";", index_col=False)       #reads the selected file and skips the first two rows due to header information. The delimiterchar is set to ; and it doesnt create an index for references
-                                                                                    #defines a new variable which is asigned with the output of read_csv. The funcion takes multiple arguments in this
-                                                                                    #case at first the file it should read from, 2. a variable of rows it should skip whil readin (here first two because they are the files header
-                                                                                    #3. the delimiter by which the funcion should begin a new column and last but not least index_col which defines if the created dataframe should have indexes
+    df = pd.read_csv(latest_file, skiprows=2, delimiter=";", index_col=False)       #reads the selected file and skips the first two rows due to header information. The delimiter character is set to ";" and it doesn't create an index for references
+                                                                                    #defines a new variable that is assigned with the output of read_csv. The function takes multiple arguments in this
+                                                                                    #case at first the file it should read from, 2. a variable of rows it should skip while reading (here first two because they are the header of the file)
+                                                                                    #3. the delimiter by which the function should begin a new column and last but not least index_col which defines if the created data frame should have indexes
 
     return(df)                                                                      #returns the newly read df
 
-external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]               #sets the external stylsheet for cascade stylization on the front-end = web page
+external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]               #sets the external stylesheet for cascade stylization on the front-end = web page
                                                                                     #creates a new variable and sets the value to the given link
                                                                                     #brackets are used to identify as link
-                                                                                    #the stylesheets are used for the visible appearence of the website wich is handelt through Cascading Style Sheets
+                                                                                    #the stylesheets are used for the visible appearance of the website which is handled through Cascading Style Sheets
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)                #creates a new dash app with the previously defined css file
 
                                                                                     #definition of the Html layout:
                                                                                     #as previously mentioned dash provides a full python abstraction around HTML, CSS, and JavaScript
-                                                                                    #and thus there is no html writing required
-                                                                                    #there is a pytho representation for each html element
+                                                                                    #and thus there is no Html writing required
+                                                                                    #there is a Python representation for each Html element
 
 app.layout = html.Div(                                                              #defining a Html Div container wich includes:
     html.Div([                                                                      #another div
        # html.H2("PV-Anlage Produktion"),                                           #a Headline (H2) -> disabled due to waste of space on website
         html.H5(id='E-Day'),                                                        #a smaller headline (H5)  -> beeing modifyed by callbacks to display energy yield of current day
         html.H5(id='E-Total'),                                                      #a smaller headline (H5)  -> beeing modifyed by callbacks to display total energy yield
-        dcc.Graph(id='todayPowerGraph'),                                            #a graph for power over day -> beeing modifyed by callbacks
-        dcc.Graph(id='weekPowerGraph'),                                             #a graph for power over last days -> beeing modifyed by callbacks
+        dcc.Graph(id='todayPowerGraph', config={'displayModeBar': False}),          #a graph for power over day -> beeing modifyed by callbacks
+        dcc.Graph(id='weekPowerGraph', config={'displayModeBar': False}),           #a graph for power over last days -> beeing modifyed by callbacks
         dcc.Interval(                                                               #an intervall component which automaicly refreshes content of the page after 1000 miliseconds
             id='interval-component',                                                    
             interval=10*1000, # in milliseconds                                         interval: This component will increment the counter n_intervals every interval milliseconds
-            n_intervals=0                                                               #n_intervals: Number of times the interval has passed                                                                             
+            n_intervals=0                                                               #n_intervals: Number of times the interval has passed  
+                                                                                        #the config displayModeBar is set to false in order to hide the grapical control panels above graphs
         )
     ])                                                                              # => id: The ID of components, is used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.
 )
@@ -107,9 +108,9 @@ def update_graph_live(n):                                                       
                                                                                     #first the header has to be defined and then the data to append ('Power': power)
                                                                                     #once again the index is ignored (ignore_index=True)
 
-    df2 = df2.iloc[::-1]                                                            #to flip the dataframe aroung -> first entry as last entry and vise verse because latest data point should be on right side
-                                                                                    #overwrites df2 with a fliped version of itself
-                                                                                    #iloc[] is a funcion for integer-location based indexing but can also be used with a slice object -> ::-1 for inversion
+    df2 = df2.iloc[::-1]                                                            #to flip the data frame around -> first entry as last entry and vise verse because latest data point should be on right side
+                                                                                    #overwrites df2 with a flipped version of itself
+                                                                                    #iloc[] is a function for integer-location based indexing but can also be used with a slice object -> ::-1 for inversion
 
     fig = px.line(df2, x="Time", y="Power", line_shape="spline")                    #creates a new fig in the form of lines which are connected trough splines (smoother graph)
                                                                                     #defines new variable fig where the output of the line function from plotly is assigned
@@ -137,27 +138,34 @@ def update_graph_live(n):                                                       
     if linux:                                                                       #if statment: is true when variable linux is True
         outdir = dir_path + "/internal/"                                            #defines outdir variable and stores in it the dir_path and appends "/internal/" to it in order to write the daily-e.csv in seperate folder
                                                                                     #in order to avoid conflicts with the previous search function for .csv files
-        if not os.path.exists(dir_path + "/internal/"):             
-            os.mkdir(dir_path + "/internal")
+        if not os.path.exists(dir_path + "/internal/"):                             #os.path.exists checks if provided path exists and returns a boolen acordingly
+            os.mkdir(dir_path + "/internal")                                        #if the path is not yet existing os.mkdir (mkdr = make directory) creates the directory
 
-    if Path(dir_path + "/internal/daily-e.csv").is_file():
-        df2 = pd.read_csv(dir_path + "/internal/daily-e.csv", index_col=False)
-    else:
-        df2 = pd.DataFrame({'Time' : [], 'E-Day' : []},)
+    try:                                                                            #try statement a try statement trys to execute the following code but continues with the code in case of failure
+        df2 = pd.read_csv(dir_path + "/internal/daily-e.csv", index_col=False)      #it tryes to read the daily-e.csv file into a variable which could fail due to corruption or the fact that the file does not exist yet
+        os.remove(dir_path + "/internal/daily-e.csv")                               #after that it ryes to delete the old file so a new file can be written more easely in a bit
+    except:                                                                         #in case the upper code fails the body of the except statment is executed
+        df2 = pd.DataFrame({'Time' : [], 'E-Day' : []},)                            #in a case of failure the variable df2 is defined too but now without any data just with the necessary column titles
    
-    if time in df2.values:                                 
-        index = df2[df2["Time"]==time].index.values
-        df2.at[index, "E-Day"] = eDay         
-        df2.to_csv(dir_path + "/internal/daily-e.csv")
-    else:
-        df2 = df2.append({'E-Day': eDay, 'Time' : time}, ignore_index=True)
-        df2.to_csv(dir_path + "/internal/daily-e.csv")
+    if time in df2.values:                                                          #the statement checks if the previosly read date from the current dataframe is already existing in the daily-e file
+        index = df2[df2["Time"]==time].index.values                                 #if so the index of the row the date was found in is assigned to a varibale
+        df2.at[index, "E-Day"] = eDay                                               #now the energy value in the data frame is overwritten with the previously recived index
+    else:               
+        df2 = df2.append({'E-Day': eDay, 'Time' : time}, ignore_index=True)         #in case the date did not exist till now it will simply append the data to the current data frame
+                                                                                            #=> new day begun
+        
+    df2 = df2.tail(weekGraphLastShownAmount)                                        #to save memory, screenspace and decrease the possibility of reading errors df2 is shortened to the last few days (14)
+                                                                                    #the function tail returns in brackets specified amount of last data entries of a data frame
     
-    df2 = df2.tail(weekGraphLastShownAmount)
+    df2.to_csv(dir_path + "/internal/daily-e.csv")                                  #after all that the new and up to date df2 is saved as daily-e.csv again to get overwritten with the next update again
+    
 
-    fig = px.bar(df2, x="Time", y="E-Day")
+    fig = px.bar(df2, x="Time", y="E-Day")                                          #creates a new fig in the form of bars
+                                                                                    #defines new variable fig where the output of the line function from plotly is assigned
+                                                                                    #the bar() function returns a figure object
+                                                                                    #bar() takes muliple arguments -> 1. the dataframe to get the necassary data 2./3. the names of the coulums which contain to be used data
    
-    return fig
+    return fig                                                                      #returnes the figure
 
 
 @app.callback(Output('E-Day', 'children'),                                          #defining a callback for the produces energy for day
@@ -177,14 +185,13 @@ def update_text_live(n):                                                        
     return ("Total: " + str(round(df["E-Total"][0]/1000, 2)) + "MWh")               #returns the Total amount of energy with the prefix Today: and suffix: kWh
 
 
-if __name__ == '__main__':                                                          #check if name = name
-    if linux:
-        app.run_server(                                                                 #calls funktion to start werbserver
-            port="8050",                                                                #defines the web port to 8050.  Standart http port  = 8080
-            host="10.18.40.200"                                                         #manually sets ip addr for linux production enviroment
-            )
-    else:
-        app.run_server(                                                                 #calls funktion to start werbserver
-            port="8050",                                                                #defines the web port to 8050.  Standart http port  = 8080
-            host=str(socket.gethostbyname(socket.gethostname()))                        #sets the ipaddr for win machines by getting curr ipaddr of machiiine
-            )
+if linux:                                                                           #cheks if os is linux due to other ip assigment
+    app.run_server(                                                                 #calls funktion to start werbserver
+        port="8050",                                                                #defines the web port to 8050.  Standart http port  = 8080
+        host="10.18.40.200"                                                         #manually sets ip addr for linux production enviroment
+        )
+else:
+    app.run_server(                                                                 #calls funktion to start werbserver
+        port="8050",                                                                #defines the web port to 8050.  Standart http port  = 8080
+        host=str(socket.gethostbyname(socket.gethostname()))                        #sets the ipaddr for win machines by getting current ipaddr of machine
+        )
